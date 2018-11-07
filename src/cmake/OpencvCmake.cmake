@@ -1,0 +1,6 @@
+set(OpenCV_DIR ${PROJECT_SOURCE_DIR}/3rdparty/opencv_build)
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+link_libraries(${OpenCV_LIBS})
+message(STATUS OpenCV_Version:${OpenCV_VERSION})
+#message(STATUS OpenCV_Include_Dir:${OpenCV_INCLUDE_DIRS})

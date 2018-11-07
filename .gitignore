@@ -1,0 +1,5 @@
+.idea/
+3rdparty/*
+cmake-build-debug/
+data/*.weights
+!3rdparty/README.MD
