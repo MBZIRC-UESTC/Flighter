@@ -19,9 +19,7 @@ namespace flight {
         }
 
         void Flight_Eye::start(std::string video_path) {
-
             cv::VideoCapture cap(video_path);
-//            cv::dnn::readNetFromDarknet("","");
             if (cap.isOpened()) {
                 clock_t counter, time_now;
                 counter = clock();
@@ -53,8 +51,8 @@ namespace flight {
 
             try{
                 darknet=cv::dnn::readNetFromDarknet(cfg_path,model_path);
-                darknet.setPreferableBackend(cv::dnn::DNN_BACKEND_DEFAULT);
-                darknet.setPreferableTarget(cv::dnn::DNN_TARGET_CPU);
+//                darknet.setPreferableBackend(cv::dnn::DNN_BACKEND_DEFAULT);
+//                darknet.setPreferableTarget(cv::dnn::DNN_TARGET_CPU);
                 this->is_load_model=true;
                 if (darknet.empty()) {
                     perror("Load Error");
@@ -146,7 +144,53 @@ namespace flight {
         }
 
         void get_target_yolo(cv::Mat src, int &x, int &y, int &z) {
+            cv::Mat inputblob = cv::dnn::blobFromImage(src, 1 / 255.f, cv::Size(416, 416), cv::Scalar(), true, false);
+//            darknet.setInput(inputblob, "data");
+            cv::Mat detectionMat;// = darknet.forward("detection_out");
+            std::stringstream ss;
+            ss << "detection time: " << time << " ms";
+            cv::putText(src, ss.str(), cv::Point(20, 20), 0, 0.5, cv::Scalar(0, 0, 255));
+            for (int i = 0; i < detectionMat.rows; i++) {
+                const int probability_index = 5;
+                const int probability_size = detectionMat.cols - probability_index;
+                float *prob_array_ptr = &detectionMat.at<float>(i, probability_index);
+                size_t objectClass = std::max_element(prob_array_ptr, prob_array_ptr + probability_size) - prob_array_ptr;
+                float confidence = detectionMat.at<float>(i, (int) objectClass + probability_index);
+                if (confidence > 0.3) {
+                    float x = detectionMat.at<float>(i, 0);
+                    float y = detectionMat.at<float>(i, 1);
 
+
+                    float width = detectionMat.at<float>(i, 2);
+                    float height = detectionMat.at<float>(i, 3);
+                    int xLeftBottom = static_cast<int>((x - width / 2) * src.cols);
+                    int yLeftBottom = static_cast<int>((y - height / 2) * src.rows);
+                    int xRightTop = static_cast<int>((x + width / 2) * src.cols);
+                    int yRightTop = static_cast<int>((y + height / 2) * src.rows);
+                    cv::circle(src, cv::Point((xRightTop+xLeftBottom)/2,(yRightTop+yLeftBottom)/2), 3, cv::Scalar(255, 0, 0), -1, 8, 0);
+                    int center_x=(xRightTop+xLeftBottom)/2;
+                    int center_y=(yRightTop+yLeftBottom)/2;
+//                moveByPositionOffset(vehicle, 0, 0, 0, (atan(center_y/center_x)*180)/PI);
+
+                    cv::Rect object(xLeftBottom, yLeftBottom,
+                                xRightTop - xLeftBottom,
+                                yRightTop - yLeftBottom);
+                    rectangle(src, object, cv::Scalar(0, 0, 255), 2, 8);
+//                if (objectClass < classNameVec.size()) {
+//                    ss.str("");
+//                    ss << confidence;
+//                    String conf(ss.str());
+//                    String label = String(classNameVec[objectClass]) + ": " + conf;
+//                    int baseLine = 0;
+//                    Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+//                    rectangle(frame, Rect(Point(xLeftBottom, yLeftBottom),
+//                                          Size(labelSize.width, labelSize.height + baseLine)),
+//                              cv::Scalar(255, 255, 255), CV_FILLED);
+//                    putText(frame, label, cv::Point(xLeftBottom, yLeftBottom + labelSize.height),
+//                            FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));
+//                }
+                }
+            }
         }
 
         void get_target_hough(cv::Mat src, int &x, int &y, int &z) {

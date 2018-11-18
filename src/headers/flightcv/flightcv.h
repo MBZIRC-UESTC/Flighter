@@ -13,7 +13,6 @@ namespace flight {
     namespace flight_cv {
         void get_target_hough(cv::Mat src, int &x, int &y, int &z);
 
-        void get_target_yolo(cv::Mat src, int &x, int &y, int &z);
 
         double get_avg(cv::Mat src);
 
@@ -35,6 +34,7 @@ namespace flight {
 
             void detcet_target(cv::Mat src, int &x, int &y, int &z);
         private:
+            void get_target_yolo(cv::Mat src, int &x, int &y, int &z);
             bool is_load_model=false;
             serial::Serial *serial;
             cv::dnn::Net darknet;
