@@ -6,7 +6,7 @@
 add_executable(fl_cv_test
         ${PROJECT_SOURCE_DIR}/src/sources/unit_test/fl_cv_test.cpp
         )
-target_link_libraries(fl_cv_test flightcv djiosdk-core )
+target_link_libraries(fl_cv_test ${OpenCV_LIBS} realsense2)
 
 #add_executable(fl_radar_test
 #        ${PROJECT_SOURCE_DIR}/src/sources/unit_test/fl_radar_test.cpp
